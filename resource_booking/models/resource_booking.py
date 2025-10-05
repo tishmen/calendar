@@ -53,18 +53,14 @@ class ResourceBooking(models.Model):
     _inherit = ["mail.thread", "mail.activity.mixin", "portal.mixin"]
     _description = "Resource Booking"
     _order = "start DESC"
-    _sql_constraints = [
-        (
-            "combination_required_if_event",
-            "CHECK(meeting_id IS NULL OR combination_id IS NOT NULL)",
-            "Missing resource booking combination.",
-        ),
-        (
-            "unique_meeting_id",
-            "UNIQUE(meeting_id)",
-            "Only one event per resource booking can exist.",
-        ),
-    ]
+    _combination_required_if_event = models.Constraint(
+        "CHECK(meeting_id IS NULL OR combination_id IS NOT NULL)",
+        "Missing resource booking combination.",
+    )
+    _unique_meeting_id = models.Constraint(
+        "UNIQUE(meeting_id)",
+        "Only one event per resource booking can exist.",
+    )
 
     active = fields.Boolean(default=True)
     meeting_id = fields.Many2one(

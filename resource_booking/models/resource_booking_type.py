@@ -10,9 +10,10 @@ class ResourceBookingType(models.Model):
     _name = "resource.booking.type"
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _description = "Resource Booking Type"
-    _sql_constraints = [
-        ("duration_positive", "CHECK(duration > 0)", "Duration must be positive."),
-    ]
+    _duration_positive = models.Constraint(
+        "CHECK (duration > 0)",
+        "Duration must be positive.",
+    )
 
     active = fields.Boolean(default=True)
     alarm_ids = fields.Many2many(
