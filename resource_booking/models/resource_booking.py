@@ -420,7 +420,13 @@ class ResourceBooking(models.Model):
         if to_delete:
             to_delete.unlink()
         if to_create:
-            _self.env["calendar.event"].create(to_create)
+            created_meetings = _self.env["calendar.event"].create(to_create)
+            # Ensure organizer is a follower with default subtypes (e.g., notes)
+            # to match expected messaging behavior in tests.
+            for meeting in created_meetings:
+                partner_id = meeting.user_id.partner_id.id if meeting.user_id else False
+                if partner_id:
+                    meeting.message_subscribe(partner_ids=[partner_id])
 
     @api.constrains("combination_id", "meeting_id", "type_id")
     def _check_scheduling(self):
