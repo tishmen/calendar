@@ -10,7 +10,6 @@ from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
-
 from odoo.tools.intervals import Intervals
 
 

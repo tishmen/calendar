@@ -14,9 +14,9 @@ from odoo.exceptions import ValidationError
 from odoo.tests import Form
 from odoo.tests.common import TransactionCase, new_test_user, users
 from odoo.tools import mute_logger
+from odoo.tools.intervals import Intervals
 
 from odoo.addons.base.tests.common import BaseCommon
-from odoo.tools.intervals import Intervals
 from odoo.addons.resource_booking.models.resource_booking import (
     _availability_is_fitting,
 )

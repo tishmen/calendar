@@ -5,7 +5,6 @@
 from pytz import UTC
 
 from odoo import api, fields, models
-
 from odoo.tools.intervals import Intervals
 
 
