@@ -77,7 +77,7 @@ class ResourceBookingType(models.Model):
             "The value is expressed in hours."
         ),
     )
-    name = fields.Char(index=True, translate=True, required=True)
+    name = fields.Char(index='trigram', translate=True, required=True)
     booking_ids = fields.One2many(
         comodel_name="resource.booking",
         inverse_name="type_id",
