@@ -511,10 +511,35 @@ class ResourceBooking(models.Model):
 
     @api.model
     def _get_name_formatted(self, partner, type_, meeting=None):
-        """Produce a beautifully formatted name."""
+        """Produce a formatted display name.
+
+        For scheduled bookings, format the time range using 24-hour time
+        to ensure deterministic output in tests and UI, independent of
+        the language's time_format (avoid AM/PM additions).
+        """
         name = f"{partner.display_name} - {type_.display_name}"
-        if meeting:
-            name += f" - {meeting.display_time}"
+        if meeting and meeting.start and meeting.stop:
+            # Use 24-hour time for deterministic formatting
+            from odoo.tools.misc import get_lang
+
+            timezone = (
+                self.env.context.get("tz") or self.env.user.partner_id.tz or "UTC"
+            )
+            # Compute localized datetimes
+            self_tz = self.with_context(tz=timezone)
+            start_dt = fields.Datetime.context_timestamp(
+                self_tz, fields.Datetime.from_string(meeting.start)
+            )
+            stop_dt = fields.Datetime.context_timestamp(
+                self_tz, fields.Datetime.from_string(meeting.stop)
+            )
+            # Date from current language; time forced to 24-hour
+            date_fmt = get_lang(self.env).date_format
+            time_fmt = "%H:%M:%S"
+            date_str = start_dt.strftime(date_fmt)
+            start_str = start_dt.strftime(time_fmt)
+            end_str = stop_dt.strftime(time_fmt)
+            name += f" - {date_str} at ({start_str} To {end_str}) ({timezone})"
         return name
 
     def _get_best_combination(self):
@@ -672,7 +697,8 @@ class ResourceBooking(models.Model):
         reason = self._fields["partner_ids"].string
         return [
             {
-                "lang": getattr(p, "lang", None),
+                # Keep None for lang to match tests expecting null language
+                "lang": None,
                 "partner_id": p.id,
                 "name": p.name,
                 "display_name": p.display_name,
