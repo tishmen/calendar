@@ -33,7 +33,7 @@ class CalendarPublicHolidayNextYear(models.TransientModel):
         last_ph_dict = {}
         ph_env = self.env["calendar.public.holiday"]
         # Avoid empty-domain search without limit for performance (lint rule W8163)
-        pholidays = self.public_holiday_ids or ph_env.search([('id', '!=', 0)])
+        pholidays = self.public_holiday_ids or ph_env.search([("id", "!=", 0)])
         if not pholidays:
             raise UserError(
                 self.env._(
