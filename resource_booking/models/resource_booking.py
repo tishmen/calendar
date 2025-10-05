@@ -270,7 +270,8 @@ class ResourceBooking(models.Model):
         res = super()._compute_display_name()
         for item in self:
             if self.env.context.get("using_portal"):
-                # ID optionally suffixed with custom name for portal users (no space after '#')
+                # ID optionally suffixed with custom name for portal users
+                # (no space after '#')
                 template = f"#{item.id} - {item.name}" if item.name else f"#{item.id}"
                 item.display_name = template
             elif not item.name and item.id:
