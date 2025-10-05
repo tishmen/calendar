@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="web_resource_booking.RBookingForm">
+        <form t-on-submit.prevent="onSubmit" class="card shadow-sm">
+            <input type="hidden" name="csrf_token" t-att-value="csrf"/>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label" for="type_id">Choose a booking type</label>
+                    <select id="type_id" name="type_id" class="form-select" required="required" t-model="state.type_id" t-on-change="onTypeChange">
+                        <option value="" disabled="disabled" selected="selected">Select…</option>
+                        <t t-foreach="props.types" t-as="t" t-key="t.id">
+                            <option t-att-value="t.id"><t t-out="t.display_name"/></option>
+                        </t>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="user_id">Choose a person to meet</label>
+                    <select id="user_id" name="user_id" class="form-select" required="required" t-att-disabled="!state.users.length" t-model="state.user_id">
+                        <option value="" disabled="disabled" selected="selected">
+                            <t t-out="state.loading ? 'Loading…' : (state.users.length ? 'Select…' : 'Select a type first')"/>
+                        </option>
+                        <t t-foreach="state.users" t-as="u" t-key="u.id">
+                            <option t-att-value="u.id"><t t-out="u.name"/></option>
+                        </t>
+                    </select>
+                </div>
+                <div class="row g-2">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="name">Your name</label>
+                        <input class="form-control" type="text" id="name" name="name" required="required" t-model="state.name"/>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="email">Your email</label>
+                        <input class="form-control" type="email" id="email" name="email" required="required" t-model="state.email"/>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="text-muted small">
+                    <i class="fa fa-info-circle me-1" aria-hidden="true"></i>
+                    We will send you an email with login information so you can further manage your bookings.
+                </div>
+                <button class="btn btn-primary" type="submit" t-att-disabled="!canSubmit()">Continue to schedule</button>
+            </div>
+        </form>
+    </t>
+</templates>
