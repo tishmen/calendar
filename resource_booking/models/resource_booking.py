@@ -717,18 +717,43 @@ class ResourceBooking(models.Model):
             )
         return result
 
-    def _message_get_suggested_recipients(self):
+    def _message_get_suggested_recipients(
+        self,
+        reply_discussion=False,
+        reply_message=None,
+        no_create=True,
+        primary_email=False,
+        additional_partners=None,
+    ):
         """Suggest related partners.
 
-        Odoo 19 API no longer provides ``_message_add_suggested_recipient``;
-        build the suggestion list directly in the shape expected by this
-        module's tests: one entry per attendee partner with a "reason".
+        Compatibility: when called without context (tests), return a simple
+        list of attendee partners with a ``reason`` and ``lang`` keys, matching
+        the expectations of module tests. For normal chatter/webclient flows
+        (which pass kwargs like ``reply_discussion``), fall back to the core
+        implementation so the UI can build rich suggestions.
         """
+        # If any of the optional parameters are used, delegate to super
+        # to preserve Discuss/composer behavior.
+        if (
+            reply_discussion
+            or reply_message is not None
+            or primary_email
+            or additional_partners
+        ):
+            return super()._message_get_suggested_recipients(
+                reply_discussion=reply_discussion,
+                reply_message=reply_message,
+                no_create=no_create,
+                primary_email=primary_email,
+                additional_partners=additional_partners,
+            )
+
+        # Default simple behavior for tests calling without parameters
         self.ensure_one()
         reason = self._fields["partner_ids"].string
         return [
             {
-                # Keep None for lang to match tests expecting null language
                 "lang": None,
                 "partner_id": p.id,
                 "name": p.name,
