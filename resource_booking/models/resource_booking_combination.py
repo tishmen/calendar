@@ -3,7 +3,7 @@
 
 from odoo import api, fields, models
 
-from odoo.addons.resource.models.utils import Intervals
+from odoo.tools.intervals import Intervals
 
 
 class ResourceBookingCombination(models.Model):
