@@ -542,6 +542,36 @@ class ResourceBooking(models.Model):
             name += f" - {date_str} at ({start_str} To {end_str}) ({timezone})"
         return name
 
+    def _get_portal_display_time(self):
+        """Return a deterministic 24-hour display string for the portal.
+
+        Example: "MM/DD/YYYY at (HH:MM:SS To HH:MM:SS) (TZ)".
+        Uses the booking's meeting start/stop, current language's date format,
+        and 24-hour time formatting, in the timezone from context/user.
+        """
+        self.ensure_one()
+        meeting = self.meeting_id
+        if not (meeting and meeting.start and meeting.stop):
+            return ""
+        from odoo.tools.misc import get_lang
+
+        timezone = self.env.context.get("tz") or self.env.user.partner_id.tz or "UTC"
+        # Compute localized datetimes
+        self_tz = self.with_context(tz=timezone)
+        start_dt = fields.Datetime.context_timestamp(
+            self_tz, fields.Datetime.from_string(meeting.start)
+        )
+        stop_dt = fields.Datetime.context_timestamp(
+            self_tz, fields.Datetime.from_string(meeting.stop)
+        )
+        # Date from current language; time forced to 24-hour
+        date_fmt = get_lang(self.env).date_format
+        time_fmt = "%H:%M:%S"
+        date_str = start_dt.strftime(date_fmt)
+        start_str = start_dt.strftime(time_fmt)
+        end_str = stop_dt.strftime(time_fmt)
+        return f"{date_str} at ({start_str} To {end_str}) ({timezone})"
+
     def _get_best_combination(self):
         """Pick best combination based on current booking state."""
         # No dates? Then return whatever is already selected (can be empty)
