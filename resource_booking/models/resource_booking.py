@@ -222,7 +222,7 @@ class ResourceBooking(models.Model):
     def _compute_access_url(self):
         result = super()._compute_access_url()
         for one in self:
-            one.access_url = "/my/bookings/%d" % one.id
+            one.access_url = f"/my/bookings/{one.id}"
         return result
 
     @api.onchange("type_id")
