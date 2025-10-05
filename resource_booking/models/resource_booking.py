@@ -656,16 +656,24 @@ class ResourceBooking(models.Model):
         return result
 
     def _message_get_suggested_recipients(self):
-        """Suggest related partners."""
-        recipients = super()._message_get_suggested_recipients()
-        for record in self:
-            for partner in record.partner_ids:
-                record._message_add_suggested_recipient(
-                    recipients,
-                    partner=partner,
-                    reason=self._fields["partner_ids"].string,
-                )
-        return recipients
+        """Suggest related partners.
+
+        Odoo 19 API no longer provides ``_message_add_suggested_recipient``;
+        build the suggestion list directly in the shape expected by this
+        module's tests: one entry per attendee partner with a "reason".
+        """
+        self.ensure_one()
+        reason = self._fields["partner_ids"].string
+        return [
+            {
+                "lang": getattr(p, "lang", None),
+                "partner_id": p.id,
+                "name": p.name,
+                "display_name": p.display_name,
+                "reason": reason,
+            }
+            for p in self.partner_ids
+        ]
 
     def action_schedule(self):
         """Redirect user to a simpler way to schedule this booking."""
