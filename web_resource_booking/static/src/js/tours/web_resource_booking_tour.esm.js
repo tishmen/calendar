@@ -1,5 +1,3 @@
-/** @odoo-module */
-
 import {registry} from "@web/core/registry";
 
 // Slim tour: visit /rbooking, ensure the form renders, and interact with fields

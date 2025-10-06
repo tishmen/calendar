@@ -1,5 +1,3 @@
-/** @odoo-module */
-
 import {Component, useState} from "@odoo/owl";
 
 class RBookingForm extends Component {
