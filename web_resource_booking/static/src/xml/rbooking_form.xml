@@ -79,7 +79,6 @@
                     </div>
                 </div>
                 <t t-if="state.questions.length">
-                    <hr />
                     <div class="mb-2 fw-bold">Additional information</div>
                     <t t-foreach="state.questions" t-as="q" t-key="q.id">
                         <div class="mb-3">
