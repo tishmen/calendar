@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
     <template id="rbooking_type_select" name="RBooking: One-Page Form">
         <t t-call="portal.portal_layout">
@@ -7,7 +7,10 @@
                 <div id="rbooking-app" data-users-endpoint="/rbooking/users">
                     <select id="rbooking-types-data" class="d-none">
                         <t t-foreach="types" t-as="t">
-                            <option t-att-value="t.id" t-att-data-name="t.display_name"/>
+                            <option
+                                t-att-value="t.id"
+                                t-att-data-name="t.display_name"
+                            />
                         </t>
                     </select>
                 </div>

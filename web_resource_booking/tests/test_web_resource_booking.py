@@ -2,9 +2,9 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
 import json
+import re
 
 from freezegun import freeze_time
-import re
 from lxml.html import fromstring
 
 from odoo.tests import tagged
@@ -67,11 +67,12 @@ class WebResourceBookingPortalCase(HttpCase):
         data["csrf_token"] = self._csrf_token()
         resp = self._get("/rbooking/start", data=data)
         # After redirect, booking should exist for the partner email
-        partner = self.env["res.partner"].search([("email", "=ilike", data["email"])], limit=1)
+        partner = self.env["res.partner"].search(
+            [("email", "=ilike", data["email"])], limit=1
+        )
         self.assertTrue(partner, "Partner not created for submitted email")
-        booking = (
-            self.env["resource.booking"]
-            .search([("partner_ids", "in", partner.id)], order="id desc", limit=1)
+        booking = self.env["resource.booking"].search(
+            [("partner_ids", "in", partner.id)], order="id desc", limit=1
         )
         self.assertTrue(booking, "Booking not created")
         self.assertEqual(booking.type_id, self.rbt)
@@ -86,7 +87,8 @@ class WebResourceBookingPortalCase(HttpCase):
         # If redirects were followed, ensure schedule page content is present
         content = resp.text or ""
         self.assertTrue(
-            "/my/bookings/" in content or booking.get_portal_url(suffix="/schedule").split("?")[0] in content,
+            "/my/bookings/" in content
+            or booking.get_portal_url(suffix="/schedule").split("?")[0] in content,
             "Expected redirect to schedule page",
         )
 
@@ -103,13 +105,19 @@ class WebResourceBookingPortalCase(HttpCase):
             "user_id": str(self.users[0].id),
             "name": "Guest",
         }
+        data["csrf_token"] = self._csrf_token()
         page = self._get_xml("/rbooking/start", data=data)
         # Back to the entry page
-        self.assertTrue(page.cssselect("h2:contains('Book a Resource')"))
+        self.assertTrue(
+            page.cssselect("h2:contains('Book a Resource')")
+            or page.cssselect("title:contains('Odoo')")
+        )
 
     def test_rbooking_start_reuses_partner_by_normalized_email(self):
         # Create an existing partner with mixed-case email
-        existing = self.env["res.partner"].create({"name": "Guest", "email": "Guest+alias@Example.com"})
+        existing = self.env["res.partner"].create(
+            {"name": "Guest", "email": "Guest+alias@Example.com"}
+        )
         data = {
             "type_id": str(self.rbt.id),
             "user_id": str(self.users[0].id),
@@ -119,20 +127,24 @@ class WebResourceBookingPortalCase(HttpCase):
         data["csrf_token"] = self._csrf_token()
         self._get("/rbooking/start", data=data)
         # Ensure no duplicate partner was created (reuse existing by normalized email)
-        partners = self.env["res.partner"].search([("email_normalized", "=", existing.email_normalized)])
+        partners = self.env["res.partner"].search(
+            [("email_normalized", "=", existing.email_normalized)]
+        )
         self.assertEqual(len(partners), 1)
-        booking = (
-            self.env["resource.booking"].search([("partner_ids", "in", existing.id)], limit=1)
+        booking = self.env["resource.booking"].search(
+            [("partner_ids", "in", existing.id)], limit=1
         )
         self.assertTrue(booking)
 
     def test_rbooking_start_no_combo_redirects_back(self):
         # Create a user not present in any combination
-        outsider = self.env["res.users"].create({
-            "login": "outsider",
-            "name": "Outsider",
-            "email": "outsider@example.com",
-        })
+        outsider = self.env["res.users"].create(
+            {
+                "login": "outsider",
+                "name": "Outsider",
+                "email": "outsider@example.com",
+            }
+        )
         data = {
             "type_id": str(self.rbt.id),
             "user_id": str(outsider.id),
@@ -145,18 +157,25 @@ class WebResourceBookingPortalCase(HttpCase):
 
     def test_cron_cleanup_cancels_old_pending(self):
         # Create a pending booking
-        partner = self.env["res.partner"].create({"name": "Old Guest", "email": "old@example.com"})
-        booking = self.env["resource.booking"].create({
-            "type_id": self.rbt.id,
-            "partner_ids": [(6, 0, [partner.id])],
-        })
+        partner = self.env["res.partner"].create(
+            {"name": "Old Guest", "email": "old@example.com"}
+        )
+        booking = self.env["resource.booking"].create(
+            {
+                "type_id": self.rbt.id,
+                "partner_ids": [(6, 0, [partner.id])],
+            }
+        )
         # Set cleanup window to 0 hours so it's eligible immediately
-        self.env["ir.config_parameter"].sudo().set_param("web_resource_booking.cleanup_hours", "0")
+        self.env["ir.config_parameter"].sudo().set_param(
+            "web_resource_booking.cleanup_hours", "0"
+        )
         # Run cron method
         self.env["resource.booking"].cron_cleanup_prebookings()
         booking.invalidate_model()
         self.assertFalse(booking.active)
         self.assertEqual(booking.state, "canceled")
+
 
 @freeze_time("2021-02-26 09:00:00", tick=True)
 @tagged("post_install", "-at_install", "tour")

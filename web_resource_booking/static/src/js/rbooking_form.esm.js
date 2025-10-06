@@ -1,19 +1,29 @@
 /** @odoo-module */
 
-import { Component, mount, useState } from "@odoo/owl";
+import {Component, mount, useState} from "@odoo/owl";
 
 class RBookingForm extends Component {
-    static template = 'web_resource_booking.RBookingForm';
+    static template = "web_resource_booking.RBookingForm";
 
     setup() {
-        this.state = useState({ type_id: "", user_id: "", users: [], loading: false, name: "", email: "" });
+        this.state = useState({
+            type_id: "",
+            user_id: "",
+            users: [],
+            loading: false,
+            name: "",
+            email: "",
+        });
         this.csrf = this.props.csrf;
         this.usersEndpoint = this.props.usersEndpoint;
         this.startUrl = this.props.startUrl || "/rbooking/start";
     }
 
     canSubmit() {
-        return !!(this.state.type_id && this.state.user_id && this.state.name && this.state.email);
+        return Boolean(this.state.type_id &&
+            this.state.user_id &&
+            this.state.name &&
+            this.state.email);
     }
 
     async onTypeChange() {
@@ -23,7 +33,7 @@ class RBookingForm extends Component {
         this.state.loading = true;
         try {
             const url = `${this.usersEndpoint}?type_id=${encodeURIComponent(this.state.type_id)}`;
-            const resp = await fetch(url, { headers: { "Accept": "application/json" } });
+            const resp = await fetch(url, {headers: {Accept: "application/json"}});
             const data = await resp.json();
             this.state.users = Array.isArray(data.users) ? data.users : [];
         } catch (e) {
