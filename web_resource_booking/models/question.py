@@ -73,4 +73,3 @@ class ResourceBookingAnswer(models.Model):
         index=True,
     )
     value = fields.Text(string="Answer")
-

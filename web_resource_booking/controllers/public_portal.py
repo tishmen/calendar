@@ -162,7 +162,12 @@ class WebResourceBookingController(http.Controller):
                 val = post.get(key)
                 if val is not None:
                     answers_payload.append(
-                        {"question_id": q.id, "value": "true" if str(val) in ("1", "true", "on", "yes") else "false"}
+                        {
+                            "question_id": q.id,
+                            "value": "true"
+                            if str(val) in ("1", "true", "on", "yes")
+                            else "false",
+                        }
                     )
             else:
                 val = (post.get(key) or "").strip()

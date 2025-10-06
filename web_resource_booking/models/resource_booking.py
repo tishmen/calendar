@@ -10,4 +10,3 @@ class ResourceBooking(models.Model):
         string="Answers",
         help="Answers provided by the requester for configured questions.",
     )
-

@@ -3,7 +3,10 @@
     <record id="resource_booking_type_view_form_inherit_questions" model="ir.ui.view">
         <field name="name">resource.booking.type.form.inherit.questions</field>
         <field name="model">resource.booking.type</field>
-        <field name="inherit_id" ref="resource_booking.resource_booking_type_view_form" />
+        <field
+            name="inherit_id"
+            ref="resource_booking.resource_booking_type_view_form"
+        />
         <field name="arch" type="xml">
             <xpath expr="//group[@name='combinations']" position="after">
                 <group name="questions" string="Questions for requesters" colspan="2">
@@ -13,8 +16,8 @@
                             <field name="name" />
                             <field name="field_type" />
                             <field name="required" />
-                            <field name="help"/>
-                            <field name="active"/>
+                            <field name="help" />
+                            <field name="active" />
                         </list>
                         <form string="Question">
                             <group>
@@ -22,10 +25,13 @@
                                 <field name="name" />
                                 <field name="field_type" />
                                 <field name="required" />
-                                <field name="help"/>
-                                <field name="active"/>
+                                <field name="help" />
+                                <field name="active" />
                             </group>
-                            <group attrs="{'invisible': [('field_type', '!=', 'select')]}" string="Options">
+                            <group
+                                attrs="{'invisible': [('field_type', '!=', 'select')]}"
+                                string="Options"
+                            >
                                 <field name="option_ids">
                                     <list editable="bottom">
                                         <field name="sequence" widget="handle" />

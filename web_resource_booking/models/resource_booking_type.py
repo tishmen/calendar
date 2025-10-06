@@ -10,4 +10,3 @@ class ResourceBookingType(models.Model):
         string="Questions",
         help="Questions to ask requesters in the public booking form.",
     )
-

@@ -44,7 +44,9 @@ class RBookingForm extends Component {
             const dataUsers = await respUsers.json();
             const dataQs = await respQs.json();
             this.state.users = Array.isArray(dataUsers.users) ? dataUsers.users : [];
-            this.state.questions = Array.isArray(dataQs.questions) ? dataQs.questions : [];
+            this.state.questions = Array.isArray(dataQs.questions)
+                ? dataQs.questions
+                : [];
         } catch {
             this.state.users = [];
             this.state.questions = [];
@@ -74,7 +76,7 @@ class RBookingForm extends Component {
         }
         // Serialize dynamic question answers from current form DOM
         try {
-            const root = this.el; // component root element
+            const root = this.el; // Component root element
             for (const q of this.state.questions) {
                 const key = `qa_${q.id}`;
                 let val = "";
@@ -97,7 +99,7 @@ class RBookingForm extends Component {
                 }
             }
         } catch (e) {
-            // no-op: if we can't serialize questions, backend will ignore
+            // No-op: if we can't serialize questions, backend will ignore
         }
         document.body.appendChild(form);
         form.submit();
