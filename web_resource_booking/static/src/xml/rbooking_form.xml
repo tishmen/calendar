@@ -4,31 +4,33 @@
         <form t-on-submit.prevent="onSubmit" class="card shadow-sm">
             <input type="hidden" name="csrf_token" t-att-value="csrf" />
             <div class="card-body">
-                <div class="mb-3">
-                    <label
-                        class="form-label"
-                        for="type_id"
-                    >Choose a booking type</label>
-                    <select
-                        id="type_id"
-                        name="type_id"
-                        class="form-select"
-                        required="required"
-                        t-model="state.type_id"
-                        t-on-change="onTypeChange"
-                    >
-                        <option
-                            value=""
-                            disabled="disabled"
-                            selected="selected"
-                        >Select…</option>
-                        <t t-foreach="props.types" t-as="t" t-key="t.id">
-                            <option t-att-value="t.id">
-                                <t t-out="t.display_name" />
-                            </option>
-                        </t>
-                    </select>
-                </div>
+                <t t-if="!props.preselectedTypeId">
+                    <div class="mb-3">
+                        <label
+                            class="form-label"
+                            for="type_id"
+                        >Choose a booking type</label>
+                        <select
+                            id="type_id"
+                            name="type_id"
+                            class="form-select"
+                            required="required"
+                            t-model="state.type_id"
+                            t-on-change="onTypeChange"
+                        >
+                            <option
+                                value=""
+                                disabled="disabled"
+                                selected="selected"
+                            >Select…</option>
+                            <t t-foreach="props.types" t-as="t" t-key="t.id">
+                                <option t-att-value="t.id">
+                                    <t t-out="t.display_name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </t>
                 <div class="mb-3">
                     <label
                         class="form-label"

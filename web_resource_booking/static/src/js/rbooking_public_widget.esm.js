@@ -26,6 +26,7 @@ publicWidget.registry.RBookingFormWidget = publicWidget.Widget.extend({
                 usersEndpoint: root.dataset.usersEndpoint,
                 questionsEndpoint:
                     root.dataset.questionsEndpoint || "/rbooking/questions",
+                preselectedTypeId: root.dataset.preselectedTypeId || "",
                 startUrl: "/rbooking/start",
                 types,
             },

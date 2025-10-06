@@ -17,6 +17,12 @@ class RBookingForm extends Component {
         this.usersEndpoint = this.props.usersEndpoint;
         this.startUrl = this.props.startUrl || "/rbooking/start";
         this.questionsEndpoint = this.props.questionsEndpoint || "/rbooking/questions";
+        // Preselect type from props if provided, and fetch dependent data
+        if (this.props.preselectedTypeId) {
+            this.state.type_id = String(this.props.preselectedTypeId);
+            // Fire and forget; state updates will re-render when data arrives
+            this.onTypeChange();
+        }
     }
 
     canSubmit() {

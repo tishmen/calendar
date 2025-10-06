@@ -118,7 +118,27 @@ class WebResourceBookingController(http.Controller):
     @http.route(["/rbooking"], type="http", auth="public", website=True, sitemap=True)
     def rbooking_index(self, **kwargs):
         types = self._visible_booking_types()
-        values = {"types": types}
+        # Optional preselection via query parameter matching a slug or id
+        slug_val = kwargs.get("slug") or kwargs.get("type") or kwargs.get("type_slug")
+        preselected_type_id = None
+        if slug_val:
+            bt_id = None
+            # Try unslug (e.g., "1-customer-meeting") then fallback to int
+            try:
+                model_name, rec_id = request.env["ir.http"]._unslug(slug_val)
+                if model_name == "resource.booking.type":
+                    bt_id = rec_id
+            except Exception:
+                try:
+                    bt_id = int(slug_val)
+                except Exception:
+                    bt_id = None
+            if bt_id:
+                candidate = request.env["resource.booking.type"].sudo().browse(bt_id)
+                # Only accept if it is visible per current company/website and has staff
+                if candidate and candidate.exists() and candidate in types:
+                    preselected_type_id = candidate.id
+        values = {"types": types, "preselected_type_id": preselected_type_id}
         return request.render("web_resource_booking.rbooking_type_select", values)
 
     @http.route(
