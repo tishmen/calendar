@@ -79,7 +79,7 @@
                     </div>
                 </div>
                 <t t-if="state.questions.length">
-                    <div class="mb-2 fw-bold">Additional information</div>
+                    <div class="pt-3 mb-2 fw-bold">Additional information</div>
                     <t t-foreach="state.questions" t-as="q" t-key="q.id">
                         <div class="mb-3">
                             <label class="form-label" t-att-for="`qa_${q.id}`">
