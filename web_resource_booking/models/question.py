@@ -26,9 +26,9 @@ class ResourceBookingQuestion(models.Model):
         ],
         required=True,
         default="char",
-        string="Field Type",
+        # string redundant; label inferred from field name
     )
-    required = fields.Boolean(string="Required", default=False)
+    required = fields.Boolean(default=False)
     option_ids = fields.One2many(
         comodel_name="resource.booking.question.option",
         inverse_name="question_id",

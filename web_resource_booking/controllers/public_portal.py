@@ -52,6 +52,69 @@ class WebResourceBookingController(http.Controller):
             ]
         )
 
+    def _parse_post_basic(self, post):
+        """Return (bt, user, name, email) or (None, None, '', '')."""
+        try:
+            type_id = int(post.get("type_id"))
+            user_id = int(post.get("user_id"))
+        except Exception:
+            return None, None, "", ""
+        name = (post.get("name") or "").strip()
+        email = (post.get("email") or "").strip()
+        if not (name and email and type_id and user_id):
+            return None, None, "", ""
+        Type = request.env["resource.booking.type"].sudo()
+        bt = Type.browse(type_id)
+        user = request.env["res.users"].sudo().browse(user_id)
+        if not (
+            bt and bt.exists() and bt.active and user and user.exists() and user.active
+        ):
+            return None, None, "", ""
+        return bt, user, name, email
+
+    def _extract_answers(self, bt, post):
+        """Return (missing_required: bool, answers_payload: list)."""
+        Question = request.env["resource.booking.question"].sudo()
+        questions = Question.search([("type_id", "=", bt.id), ("active", "=", True)])
+        missing_required = False
+        answers_payload = []
+        for q in questions:
+            key = f"qa_{q.id}"
+            if q.field_type == "boolean":
+                if key not in post and q.required:
+                    missing_required = True
+                    continue
+                val = post.get(key)
+                if val is not None:
+                    answers_payload.append(
+                        {
+                            "question_id": q.id,
+                            "value": "true"
+                            if str(val) in ("1", "true", "on", "yes")
+                            else "false",
+                        }
+                    )
+            else:
+                val = (post.get(key) or "").strip()
+                if q.required and not val:
+                    missing_required = True
+                elif val:
+                    answers_payload.append({"question_id": q.id, "value": val})
+        return missing_required, answers_payload
+
+    def _get_or_create_partner(self, name, email):
+        Partner = request.env["res.partner"].sudo()
+        normalized = email_normalize(email)
+        domain = (
+            [("email_normalized", "=", normalized)]
+            if normalized
+            else [("email", "=ilike", email)]
+        )
+        partner = Partner.search(domain, limit=1)
+        if not partner:
+            partner = Partner.create({"name": name, "email": email})
+        return partner
+
     @http.route(["/rbooking"], type="http", auth="public", website=True, sitemap=True)
     def rbooking_index(self, **kwargs):
         types = self._visible_booking_types()
@@ -127,54 +190,11 @@ class WebResourceBookingController(http.Controller):
         csrf=True,
     )
     def rbooking_start(self, **post):
-        try:
-            type_id = int(post.get("type_id"))
-            user_id = int(post.get("user_id"))
-        except Exception:
-            return request.redirect("/rbooking")
-        name = (post.get("name") or "").strip()
-        email = (post.get("email") or "").strip()
-        if not (name and email and type_id and user_id):
-            # If fields are missing, just bounce back to the entry form
+        bt, user, name, email = self._parse_post_basic(post)
+        if not bt:
             return request.redirect("/rbooking")
 
-        Type = request.env["resource.booking.type"].sudo()
-        bt = Type.browse(type_id)
-        user = request.env["res.users"].sudo().browse(user_id)
-        if not (
-            bt and bt.exists() and bt.active and user and user.exists() and user.active
-        ):
-            return request.redirect("/rbooking")
-
-        # Validate required questions
-        Question = request.env["resource.booking.question"].sudo()
-        questions = Question.search([("type_id", "=", bt.id), ("active", "=", True)])
-        # Build a map of posted answers; booleans may be omitted when unchecked
-        missing_required = False
-        answers_payload = []
-        for q in questions:
-            key = f"qa_{q.id}"
-            if q.field_type == "boolean":
-                # radio '1'/'0'. Missing means not answered.
-                if key not in post and q.required:
-                    missing_required = True
-                    continue
-                val = post.get(key)
-                if val is not None:
-                    answers_payload.append(
-                        {
-                            "question_id": q.id,
-                            "value": "true"
-                            if str(val) in ("1", "true", "on", "yes")
-                            else "false",
-                        }
-                    )
-            else:
-                val = (post.get(key) or "").strip()
-                if q.required and not val:
-                    missing_required = True
-                elif val:
-                    answers_payload.append({"question_id": q.id, "value": val})
+        missing_required, answers_payload = self._extract_answers(bt, post)
         if missing_required:
             return request.redirect("/rbooking")
 
@@ -182,16 +202,7 @@ class WebResourceBookingController(http.Controller):
         if not combos:
             return request.redirect("/rbooking")
 
-        Partner = request.env["res.partner"].sudo()
-        normalized = email_normalize(email)
-        domain = (
-            [("email_normalized", "=", normalized)]
-            if normalized
-            else [("email", "=ilike", email)]
-        )
-        partner = Partner.search(domain, limit=1)
-        if not partner:
-            partner = Partner.create({"name": name, "email": email})
+        partner = self._get_or_create_partner(name, email)
 
         Booking = request.env["resource.booking"].sudo()
         booking = Booking.create(

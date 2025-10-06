@@ -6,6 +6,13 @@ from odoo import api, fields, models
 class ResourceBookingCleanup(models.Model):
     _inherit = "resource.booking"
 
+    answer_ids = fields.One2many(
+        comodel_name="resource.booking.answer",
+        inverse_name="booking_id",
+        string="Answers",
+        help="Answers provided by the requester for configured questions.",
+    )
+
     @api.model
     def cron_cleanup_prebookings(self):
         """Archive old pending bookings created via the web entry.

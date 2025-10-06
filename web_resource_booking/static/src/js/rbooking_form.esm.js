@@ -76,7 +76,8 @@ class RBookingForm extends Component {
         }
         // Serialize dynamic question answers from current form DOM
         try {
-            const root = this.el; // Component root element
+            // Component root element
+            const root = this.el;
             for (const q of this.state.questions) {
                 const key = `qa_${q.id}`;
                 let val = "";
@@ -98,7 +99,7 @@ class RBookingForm extends Component {
                     form.appendChild(input);
                 }
             }
-        } catch (e) {
+        } catch {
             // No-op: if we can't serialize questions, backend will ignore
         }
         document.body.appendChild(form);
