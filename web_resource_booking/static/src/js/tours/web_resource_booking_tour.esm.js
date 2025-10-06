@@ -1,6 +1,6 @@
 /** @odoo-module */
 
-import { registry } from "@web/core/registry";
+import {registry} from "@web/core/registry";
 
 // Slim tour: visit /rbooking, ensure the form renders, and interact with fields
 registry.category("web_tour.tours").add("web_resource_booking_public_tour", {
@@ -25,7 +25,6 @@ registry.category("web_tour.tours").add("web_resource_booking_public_tour", {
             // Wait until the user select is enabled and has at least one real option
             trigger: "#rbooking-app select#user_id:not(:disabled):has(option[value])",
             timeout: 20000,
-            run: () => {},
         },
         {
             content: "Pick first user",

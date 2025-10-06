@@ -1,6 +1,6 @@
 /** @odoo-module */
 
-import {Component, mount, useState} from "@odoo/owl";
+import {Component, useState} from "@odoo/owl";
 
 class RBookingForm extends Component {
     static template = "web_resource_booking.RBookingForm";
@@ -20,10 +20,12 @@ class RBookingForm extends Component {
     }
 
     canSubmit() {
-        return Boolean(this.state.type_id &&
-            this.state.user_id &&
-            this.state.name &&
-            this.state.email);
+        return Boolean(
+            this.state.type_id &&
+                this.state.user_id &&
+                this.state.name &&
+                this.state.email
+        );
     }
 
     async onTypeChange() {
@@ -36,7 +38,7 @@ class RBookingForm extends Component {
             const resp = await fetch(url, {headers: {Accept: "application/json"}});
             const data = await resp.json();
             this.state.users = Array.isArray(data.users) ? data.users : [];
-        } catch (e) {
+        } catch {
             this.state.users = [];
         } finally {
             this.state.loading = false;

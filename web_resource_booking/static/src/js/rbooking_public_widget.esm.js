@@ -1,8 +1,8 @@
 /** @odoo-module */
 
-import publicWidget from "@web/legacy/js/public/public_widget";
-import {mount} from "@odoo/owl";
 import {getTemplate} from "@web/core/templates";
+import {mount} from "@odoo/owl";
+import publicWidget from "@web/legacy/js/public/public_widget";
 import RBookingForm from "./rbooking_form.esm";
 
 publicWidget.registry.RBookingFormWidget = publicWidget.Widget.extend({

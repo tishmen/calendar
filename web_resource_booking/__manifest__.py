@@ -4,7 +4,7 @@
     "version": "19.0.1.0.0",
     "category": "Appointments",
     "website": "https://github.com/OCA/calendar",
-    "author": "Milan Topuzov",
+    "author": "Odoo Community Association (OCA)",
     "license": "AGPL-3",
     "depends": ["resource_booking", "portal"],
     "data": [

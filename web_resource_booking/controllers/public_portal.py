@@ -1,3 +1,5 @@
+import logging
+
 from odoo import http
 from odoo.http import request
 from odoo.tools.mail import email_normalize
@@ -142,7 +144,7 @@ class WebResourceBookingController(http.Controller):
                 )
                 for wu in wiz.user_ids:
                     wu.action_grant_access()
-            except Exception:
-                pass
+            except Exception as exc:
+                logging.getLogger(__name__).info("Portal invite skipped: %s", exc)
 
         return request.redirect(booking.get_portal_url(suffix="/schedule"))
