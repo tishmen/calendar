@@ -9,6 +9,8 @@
     "depends": ["resource_booking", "portal"],
     "data": [
         "templates/public_portal.xml",
+        "views/resource_booking_type_question_views.xml",
+        "security/ir.model.access.csv",
         "data/cron.xml",
     ],
     "assets": {
@@ -25,4 +27,7 @@
     },
     "application": False,
     "installable": True,
+    "demo": [
+        "demo/questions_demo.xml",
+    ],
 }

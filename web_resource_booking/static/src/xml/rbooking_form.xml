@@ -78,6 +78,45 @@
                         />
                     </div>
                 </div>
+                <t t-if="state.questions.length">
+                    <hr/>
+                    <div class="mb-2 fw-bold">Additional information</div>
+                    <t t-foreach="state.questions" t-as="q" t-key="q.id">
+                        <div class="mb-3">
+                            <label class="form-label" t-att-for="`qa_${q.id}`">
+                                <t t-out="q.name"/>
+                                <t t-if="q.required"> <span class="text-danger">*</span></t>
+                            </label>
+                            <t t-if="q.field_type === 'char'">
+                                <input class="form-control" type="text" t-att-id="`qa_${q.id}`" t-att-name="`qa_${q.id}`" t-att-required="q.required ? 'required' : undefined"/>
+                            </t>
+                            <t t-if="q.field_type === 'text'">
+                                <textarea class="form-control" rows="3" t-att-id="`qa_${q.id}`" t-att-name="`qa_${q.id}`" t-att-required="q.required ? 'required' : undefined"></textarea>
+                            </t>
+                            <t t-if="q.field_type === 'boolean'">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" t-att-id="`qa_${q.id}_yes`" t-att-name="`qa_${q.id}`" value="1" t-att-required="q.required ? 'required' : undefined"/>
+                                    <label class="form-check-label" t-att-for="`qa_${q.id}_yes`">Yes</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" t-att-id="`qa_${q.id}_no`" t-att-name="`qa_${q.id}`" value="0" t-att-required="q.required ? 'required' : undefined"/>
+                                    <label class="form-check-label" t-att-for="`qa_${q.id}_no`">No</label>
+                                </div>
+                            </t>
+                            <t t-if="q.field_type === 'select'">
+                                <select class="form-select" t-att-id="`qa_${q.id}`" t-att-name="`qa_${q.id}`" t-att-required="q.required ? 'required' : undefined">
+                                    <option value="" selected="selected" t-if="!q.required">Select…</option>
+                                    <t t-foreach="q.options" t-as="opt" t-key="opt.id">
+                                        <option t-att-value="opt.id"><t t-out="opt.name"/></option>
+                                    </t>
+                                </select>
+                            </t>
+                            <small class="form-text text-muted" t-if="q.help">
+                                <t t-out="q.help"/>
+                            </small>
+                        </div>
+                    </t>
+                </t>
             </div>
             <div
                 class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2"

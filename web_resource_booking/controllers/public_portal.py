@@ -82,6 +82,43 @@ class WebResourceBookingController(http.Controller):
         return request.make_json_response({"users": payload})
 
     @http.route(
+        ["/rbooking/questions"], type="http", auth="public", website=True, csrf=False
+    )
+    def rbooking_questions(self, type_id=None, **kwargs):
+        try:
+            type_id = int(type_id or 0)
+        except Exception:
+            type_id = 0
+        if not type_id:
+            return request.make_json_response({"questions": []})
+        Type = request.env["resource.booking.type"].sudo()
+        bt = Type.browse(type_id)
+        if (
+            not bt
+            or not bt.exists()
+            or not bt.active
+            or bt.company_id not in self._get_allowed_companies()
+        ):
+            return request.make_json_response({"questions": []})
+
+        Question = request.env["resource.booking.question"].sudo()
+        questions = Question.search([("type_id", "=", bt.id), ("active", "=", True)])
+        payload = []
+        for q in questions:
+            item = {
+                "id": q.id,
+                "name": q.name,
+                "help": q.help or "",
+                "field_type": q.field_type,
+                "required": bool(q.required),
+                "options": [],
+            }
+            if q.field_type == "select":
+                item["options"] = [{"id": o.id, "name": o.name} for o in q.option_ids]
+            payload.append(item)
+        return request.make_json_response({"questions": payload})
+
+    @http.route(
         ["/rbooking/start"],
         type="http",
         auth="public",
@@ -109,6 +146,33 @@ class WebResourceBookingController(http.Controller):
         ):
             return request.redirect("/rbooking")
 
+        # Validate required questions
+        Question = request.env["resource.booking.question"].sudo()
+        questions = Question.search([("type_id", "=", bt.id), ("active", "=", True)])
+        # Build a map of posted answers; booleans may be omitted when unchecked
+        missing_required = False
+        answers_payload = []
+        for q in questions:
+            key = f"qa_{q.id}"
+            if q.field_type == "boolean":
+                # radio '1'/'0'. Missing means not answered.
+                if key not in post and q.required:
+                    missing_required = True
+                    continue
+                val = post.get(key)
+                if val is not None:
+                    answers_payload.append(
+                        {"question_id": q.id, "value": "true" if str(val) in ("1", "true", "on", "yes") else "false"}
+                    )
+            else:
+                val = (post.get(key) or "").strip()
+                if q.required and not val:
+                    missing_required = True
+                elif val:
+                    answers_payload.append({"question_id": q.id, "value": val})
+        if missing_required:
+            return request.redirect("/rbooking")
+
         combos = self._combos_for(bt, user)
         if not combos:
             return request.redirect("/rbooking")
@@ -133,6 +197,18 @@ class WebResourceBookingController(http.Controller):
                 "combination_auto_assign": False,
             }
         )
+
+        # Persist answers
+        if answers_payload:
+            Answer = request.env["resource.booking.answer"].sudo()
+            for ap in answers_payload:
+                Answer.create(
+                    {
+                        "booking_id": booking.id,
+                        "question_id": ap["question_id"],
+                        "value": ap["value"],
+                    }
+                )
 
         if request.env.user._is_public() and partner and partner.email:
             try:

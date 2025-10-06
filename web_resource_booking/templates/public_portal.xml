@@ -4,7 +4,7 @@
         <t t-call="portal.portal_layout">
             <div id="wrap" class="container mt-4">
                 <h2>Book a Resource</h2>
-                <div id="rbooking-app" data-users-endpoint="/rbooking/users">
+                <div id="rbooking-app" data-users-endpoint="/rbooking/users" data-questions-endpoint="/rbooking/questions">
                     <select id="rbooking-types-data" class="d-none">
                         <t t-foreach="types" t-as="t">
                             <option

@@ -24,6 +24,7 @@ publicWidget.registry.RBookingFormWidget = publicWidget.Widget.extend({
             props: {
                 csrf,
                 usersEndpoint: root.dataset.usersEndpoint,
+                questionsEndpoint: root.dataset.questionsEndpoint || "/rbooking/questions",
                 startUrl: "/rbooking/start",
                 types,
             },

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Demo Q&A for public resource booking form -->
+<odoo>
+    <!-- Questions for the demo booking type from resource_booking -->
+    <record id="rbooking_question_company" model="resource.booking.question">
+        <field name="type_id" ref="resource_booking.resource_booking_type_customer"/>
+        <field name="sequence">1</field>
+        <field name="name">Company name</field>
+        <field name="field_type">char</field>
+        <field name="required">False</field>
+    </record>
+
+    <record id="rbooking_question_description" model="resource.booking.question">
+        <field name="type_id" ref="resource_booking.resource_booking_type_customer"/>
+        <field name="sequence">2</field>
+        <field name="name">Describe your request</field>
+        <field name="field_type">text</field>
+        <field name="required">False</field>
+        <field name="help">Add any context that will help us prepare.</field>
+    </record>
+
+    <record id="rbooking_question_contact_method" model="resource.booking.question">
+        <field name="type_id" ref="resource_booking.resource_booking_type_customer"/>
+        <field name="sequence">3</field>
+        <field name="name">Preferred contact method</field>
+        <field name="field_type">select</field>
+        <field name="required">True</field>
+        <field name="option_ids" eval="[(0,0,{'sequence': 1, 'name': 'Email'}), (0,0,{'sequence': 2, 'name': 'Phone'}), (0,0,{'sequence': 3, 'name': 'In-person'})]"/>
+    </record>
+
+    <record id="rbooking_question_privacy" model="resource.booking.question">
+        <field name="type_id" ref="resource_booking.resource_booking_type_customer"/>
+        <field name="sequence">4</field>
+        <field name="name">Do you agree to the privacy policy?</field>
+        <field name="field_type">boolean</field>
+        <field name="required">True</field>
+    </record>
+</odoo>
+

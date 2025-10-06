@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+resource_booking_question_user,Read questions (users),model_resource_booking_question,resource_booking.group_user,1,0,0,0
+resource_booking_question_manager,Manage questions (managers),model_resource_booking_question,resource_booking.group_manager,1,1,1,1
+resource_booking_question_option_user,Read question options (users),model_resource_booking_question_option,resource_booking.group_user,1,0,0,0
+resource_booking_question_option_manager,Manage question options (managers),model_resource_booking_question_option,resource_booking.group_manager,1,1,1,1
+resource_booking_answer_user,Read answers (users),model_resource_booking_answer,resource_booking.group_user,1,0,0,0
+resource_booking_answer_manager,Manage answers (managers),model_resource_booking_answer,resource_booking.group_manager,1,1,1,1

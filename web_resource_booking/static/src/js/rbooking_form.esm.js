@@ -11,10 +11,12 @@ class RBookingForm extends Component {
             loading: false,
             name: "",
             email: "",
+            questions: [],
         });
         this.csrf = this.props.csrf;
         this.usersEndpoint = this.props.usersEndpoint;
         this.startUrl = this.props.startUrl || "/rbooking/start";
+        this.questionsEndpoint = this.props.questionsEndpoint || "/rbooking/questions";
     }
 
     canSubmit() {
@@ -29,15 +31,23 @@ class RBookingForm extends Component {
     async onTypeChange() {
         this.state.user_id = "";
         this.state.users = [];
+        this.state.questions = [];
         if (!this.state.type_id) return;
         this.state.loading = true;
         try {
-            const url = `${this.usersEndpoint}?type_id=${encodeURIComponent(this.state.type_id)}`;
-            const resp = await fetch(url, {headers: {Accept: "application/json"}});
-            const data = await resp.json();
-            this.state.users = Array.isArray(data.users) ? data.users : [];
+            const urlUsers = `${this.usersEndpoint}?type_id=${encodeURIComponent(this.state.type_id)}`;
+            const urlQs = `${this.questionsEndpoint}?type_id=${encodeURIComponent(this.state.type_id)}`;
+            const [respUsers, respQs] = await Promise.all([
+                fetch(urlUsers, {headers: {Accept: "application/json"}}),
+                fetch(urlQs, {headers: {Accept: "application/json"}}),
+            ]);
+            const dataUsers = await respUsers.json();
+            const dataQs = await respQs.json();
+            this.state.users = Array.isArray(dataUsers.users) ? dataUsers.users : [];
+            this.state.questions = Array.isArray(dataQs.questions) ? dataQs.questions : [];
         } catch {
             this.state.users = [];
+            this.state.questions = [];
         } finally {
             this.state.loading = false;
         }
@@ -61,6 +71,33 @@ class RBookingForm extends Component {
             input.name = k;
             input.value = v;
             form.appendChild(input);
+        }
+        // Serialize dynamic question answers from current form DOM
+        try {
+            const root = this.el; // component root element
+            for (const q of this.state.questions) {
+                const key = `qa_${q.id}`;
+                let val = "";
+                if (q.field_type === "boolean") {
+                    const el = root.querySelector(`input[name="${key}"]:checked`);
+                    val = el ? el.value : "";
+                } else if (q.field_type === "select") {
+                    const el = root.querySelector(`#${key}`);
+                    val = el ? el.value : "";
+                } else {
+                    const el = root.querySelector(`#${key}`);
+                    val = el ? el.value : "";
+                }
+                if (val !== "") {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = key;
+                    input.value = val;
+                    form.appendChild(input);
+                }
+            }
+        } catch (e) {
+            // no-op: if we can't serialize questions, backend will ignore
         }
         document.body.appendChild(form);
         form.submit();
