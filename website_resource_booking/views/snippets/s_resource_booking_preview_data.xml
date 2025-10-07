@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="s_resource_booking_preview_data" name="Resource Booking Preview Data">
+        <t t-call="website_resource_booking.s_resource_booking_card_body"/>
+    </template>
+</odoo>
+

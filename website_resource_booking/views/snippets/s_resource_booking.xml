@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add a new snippet group and a simple snippet pointing to the public booking page -->
+
+    <template id="snippets" inherit_id="website.snippets">
+        <xpath expr="//t[@id='installed_snippets_hook']" position="after">
+            <t snippet-group="resource_booking" t-snippet="website.s_snippet_group" string="Resource Booking"
+               t-thumbnail="/website_resource_booking/static/src/img/snippets_thumbs/s_resource_booking.svg"/>
+        </xpath>
+        <xpath expr="//t[@id='structure']" position="inside">
+            <t t-snippet="website_resource_booking.s_resource_booking_card" string="Resource Booking" group="resource_booking"/>
+        </xpath>
+    </template>
+
+    <!-- Base snippet template (re-usable) -->
+    <template id="s_resource_booking" name="Resource Booking">
+        <t t-call="website.s_dynamic_snippet_template">
+            <t t-set="snippet_name" t-value="'s_resource_booking'"/>
+            <!-- Link to the public entry point provided by web_resource_booking -->
+            <t t-set="main_page_url" t-value="'/rbooking'"/>
+            <t t-out="0"/>
+        </t>
+    </template>
+
+    <!-- Card variant (placeholder) -->
+    <template id="s_resource_booking_card" name="Resource Booking Card">
+        <t t-call="website_resource_booking.s_resource_booking">
+            <t t-call="website_resource_booking.s_resource_booking_preview_data"/>
+        </t>
+    </template>
+
+    <!-- Simple card body used in preview/sample mode -->
+    <template id="s_resource_booking_card_body">
+        <section class="s_card">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Book a Resource</h5>
+                                <p class="card-text">Add this snippet to link visitors to your public booking page.</p>
+                                <a class="btn btn-primary" href="/rbooking">Open booking page</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </template>
+
+</odoo>
+
