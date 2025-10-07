@@ -1,5 +1,4 @@
 from odoo import http
-from odoo.http import request
 
 
 class WebsiteResourceBookingSnippets(http.Controller):
@@ -12,7 +11,11 @@ class WebsiteResourceBookingSnippets(http.Controller):
     """
 
     # Placeholder endpoint if we need to feed dynamic content later.
-    @http.route("/website_resource_booking/snippet/ping", type="json", auth="public", website=True)
+    @http.route(
+        "/website_resource_booking/snippet/ping",
+        type="json",
+        auth="public",
+        website=True,
+    )
     def ping(self):  # pragma: no cover - placeholder
         return {"status": "ok"}
-

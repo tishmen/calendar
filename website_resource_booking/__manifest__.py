@@ -6,13 +6,10 @@
     "website": "https://github.com/OCA/calendar",
     "author": "Tecnativa, Odoo Community Association (OCA)",
     "license": "AGPL-3",
-    "depends": [
-        "website",
-        "resource_booking"
-    ],
+    "depends": ["website", "resource_booking"],
     "data": [
         "views/snippets/s_resource_booking.xml",
-        "views/snippets/s_resource_booking_preview_data.xml"
+        "views/snippets/s_resource_booking_preview_data.xml",
     ],
     "assets": {},
     "application": False,
