@@ -32,6 +32,7 @@
                         data-users-endpoint="/rbooking/users"
                         data-questions-endpoint="/rbooking/questions"
                         t-att-data-preselected-type-id="preselected_type_id or ''"
+                        t-att-data-preselected-user-id="preselected_user_id or ''"
                     >
                         <select id="rbooking-types-data" class="d-none">
                             <t t-foreach="types" t-as="t">
