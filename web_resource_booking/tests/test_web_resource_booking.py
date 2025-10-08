@@ -39,7 +39,7 @@ class WebResourceBookingPortalCase(HttpCase):
     def test_rbooking_index_page(self):
         page = self._get_xml("/rbooking")
         # Page title and mount div should be present
-        self.assertTrue(page.cssselect("h2:contains('Book a Resource')"))
+        self.assertTrue(page.cssselect("h2:contains('Book an Appointment')"))
         mount = page.cssselect("#rbooking-app")
         self.assertTrue(mount, "rbooking mount node missing")
         # Hidden select must list available types
@@ -109,7 +109,7 @@ class WebResourceBookingPortalCase(HttpCase):
         page = self._get_xml("/rbooking/start", data=data)
         # Back to the entry page
         self.assertTrue(
-            page.cssselect("h2:contains('Book a Resource')")
+            page.cssselect("h2:contains('Book an Appointment')")
             or page.cssselect("title:contains('Odoo')")
         )
 

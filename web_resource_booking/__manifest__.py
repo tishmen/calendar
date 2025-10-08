@@ -29,5 +29,6 @@
     "installable": True,
     "demo": [
         "demo/questions_demo.xml",
+        "demo/resource_booking_type_extra_demo.xml",
     ],
 }

@@ -25,6 +25,32 @@ class RBookingForm extends Component {
         }
     }
 
+    get selectedType() {
+        const id = this.state.type_id;
+        return (this.props.types || []).find((t) => String(t.id) === String(id));
+    }
+
+    resetType() {
+        this._log("resetType");
+        this.state.type_id = "";
+        this.state.user_id = "";
+        this.state.users = [];
+        this.state.questions = [];
+        this.state.name = "";
+        this.state.email = "";
+    }
+
+    get selectedUser() {
+        const uid = this.state.user_id;
+        const list = this.state.users || [];
+        return list.find((u) => String(u.id) === String(uid));
+    }
+
+    resetUser() {
+        this._log("resetUser");
+        this.state.user_id = "";
+    }
+
     canSubmit() {
         return Boolean(
             this.state.type_id &&

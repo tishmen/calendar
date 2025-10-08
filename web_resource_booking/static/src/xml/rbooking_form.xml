@@ -3,8 +3,75 @@
     <t t-name="web_resource_booking.RBookingForm">
         <form t-on-submit.prevent="onSubmit" class="card shadow-sm">
             <input type="hidden" name="csrf_token" t-att-value="csrf" />
+            <t t-if="selectedType">
+                <t t-set="tmeta" t-value="selectedType" />
+                <div class="card-header" style="background-color: var(--card-cap-bg);">
+                    <div class="d-flex align-items-start">
+                        <div class="d-flex align-items-start gap-3 flex-grow-1">
+                            <img
+                                t-att-src="tmeta.image"
+                                alt="Type image"
+                                class="rounded"
+                                style="width: 56px; height: 56px; object-fit: cover;"
+                            />
+                            <div class="flex-grow-1">
+                                <div
+                                    class="d-flex align-items-center gap-2 mb-2"
+                                    t-if="state.users &amp;&amp; state.users.length"
+                                >
+                                    <t t-set="maxAvatars" t-value="5" />
+                                    <t
+                                        t-foreach="state.users.slice(0, maxAvatars)"
+                                        t-as="u"
+                                        t-key="u.id"
+                                    >
+                                        <img
+                                            class="o_avatar rounded"
+                                            t-attf-src="/web/image/res.users/#{u.id}/avatar_128"
+                                            alt="Avatar"
+                                            style="width:24px;height:24px;object-fit:cover;"
+                                        />
+                                    </t>
+                                    <t t-if="state.users.length &gt; maxAvatars">
+                                        <span class="badge bg-secondary">+<t
+                                            t-out="state.users.length - maxAvatars"
+                                        /></span>
+                                    </t>
+                                </div>
+                                <div class="fw-semibold" t-out="tmeta.display_name" />
+                                <div
+                                    class="text-muted"
+                                    t-if="tmeta.note"
+                                    t-out="tmeta.note"
+                                />
+                                <div
+                                    class="d-flex flex-wrap gap-3 mt-2 small text-muted"
+                                >
+                                    <div t-if="tmeta.location">
+                                        <i class="fa fa-map-marker me-1" />
+                                        <t t-out="tmeta.location" />
+                                    </div>
+                                    <div t-if="tmeta.slug">
+                                        <i class="fa fa-link me-1" />
+                                        <a
+                                            t-att-href="'/rbooking/' + tmeta.slug"
+                                        >Share link</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            t-if="!props.preselectedTypeId"
+                            type="button"
+                            class="btn-close ms-2"
+                            aria-label="Change type"
+                            t-on-click="resetType"
+                        />
+                    </div>
+                </div>
+            </t>
             <div class="card-body">
-                <t t-if="!props.preselectedTypeId">
+                <t t-if="!props.preselectedTypeId and !state.type_id">
                     <div class="mb-3">
                         <label
                             class="form-label"
@@ -31,55 +98,92 @@
                         </select>
                     </div>
                 </t>
-                <div class="mb-3">
-                    <label
-                        class="form-label"
-                        for="user_id"
-                    >Choose a person to meet</label>
-                    <select
-                        id="user_id"
-                        name="user_id"
-                        class="form-select"
-                        required="required"
-                        t-att-disabled="!state.users.length"
-                        t-model="state.user_id"
-                    >
-                        <option value="" disabled="disabled" selected="selected">
-                            <t
-                                t-out="state.loading ? 'Loading…' : (state.users.length ? 'Select…' : 'Select a type first')"
+                <t t-if="state.type_id">
+                    <t t-if="state.user_id and selectedUser">
+                        <div
+                            class="rounded p-2 mb-3"
+                            style="background-color: var(--card-cap-bg);"
+                        >
+                            <div
+                                class="d-flex align-items-center justify-content-between"
+                            >
+                                <div class="d-flex align-items-center gap-2">
+                                    <img
+                                        t-attf-src="/web/image/res.users/#{selectedUser.id}/avatar_128"
+                                        alt="Avatar"
+                                        class="rounded"
+                                        style="width: 28px; height: 28px; object-fit: cover;"
+                                    />
+                                    <span
+                                        class="fw-semibold"
+                                        t-out="selectedUser.name"
+                                    />
+                                </div>
+                                <button
+                                    type="button"
+                                    class="btn-close"
+                                    aria-label="Change person"
+                                    t-on-click="resetUser"
+                                />
+                            </div>
+                        </div>
+                    </t>
+                    <t t-if="!state.user_id">
+                        <div class="mb-3">
+                            <label
+                                class="form-label"
+                                for="user_id"
+                            >Choose a person to meet</label>
+                            <select
+                                id="user_id"
+                                name="user_id"
+                                class="form-select"
+                                required="required"
+                                t-att-disabled="!state.users.length"
+                                t-model="state.user_id"
+                            >
+                                <option
+                                    value=""
+                                    disabled="disabled"
+                                    selected="selected"
+                                >
+                                    <t
+                                        t-out="state.loading ? 'Loading…' : (state.users.length ? 'Select…' : 'Select a type first')"
+                                    />
+                                </option>
+                                <t t-foreach="state.users" t-as="u" t-key="u.id">
+                                    <option t-att-value="u.id">
+                                        <t t-out="u.name" />
+                                    </option>
+                                </t>
+                            </select>
+                        </div>
+                    </t>
+                    <div class="row g-2">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="name">Your name</label>
+                            <input
+                                class="form-control"
+                                type="text"
+                                id="name"
+                                name="name"
+                                required="required"
+                                t-model="state.name"
                             />
-                        </option>
-                        <t t-foreach="state.users" t-as="u" t-key="u.id">
-                            <option t-att-value="u.id">
-                                <t t-out="u.name" />
-                            </option>
-                        </t>
-                    </select>
-                </div>
-                <div class="row g-2">
-                    <div class="col-12 col-md-6">
-                        <label class="form-label" for="name">Your name</label>
-                        <input
-                            class="form-control"
-                            type="text"
-                            id="name"
-                            name="name"
-                            required="required"
-                            t-model="state.name"
-                        />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="email">Your email</label>
+                            <input
+                                class="form-control"
+                                type="email"
+                                id="email"
+                                name="email"
+                                required="required"
+                                t-model="state.email"
+                            />
+                        </div>
                     </div>
-                    <div class="col-12 col-md-6">
-                        <label class="form-label" for="email">Your email</label>
-                        <input
-                            class="form-control"
-                            type="email"
-                            id="email"
-                            name="email"
-                            required="required"
-                            t-model="state.email"
-                        />
-                    </div>
-                </div>
+                </t>
                 <t t-if="state.questions.length">
                     <div class="pt-3 mb-2 fw-bold">Additional information</div>
                     <t t-foreach="state.questions" t-as="q" t-key="q.id">

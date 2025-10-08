@@ -2,22 +2,29 @@
 <odoo>
     <template id="rbooking_type_select" name="RBooking: One-Page Form">
         <t t-call="portal.portal_layout">
+            <t t-set="no_breadcrumbs" t-value="True" />
             <div id="wrap" class="container mt-4">
-                <h2>Book a Resource</h2>
-                <div
-                    id="rbooking-app"
-                    data-users-endpoint="/rbooking/users"
-                    data-questions-endpoint="/rbooking/questions"
-                    t-att-data-preselected-type-id="preselected_type_id or ''"
-                >
-                    <select id="rbooking-types-data" class="d-none">
-                        <t t-foreach="types" t-as="t">
-                            <option
-                                t-att-value="t.id"
-                                t-att-data-name="t.display_name"
-                            />
-                        </t>
-                    </select>
+                <div class="mx-auto" style="max-width: 600px;">
+                    <h2>Book an Appointment</h2>
+                    <div
+                        id="rbooking-app"
+                        data-users-endpoint="/rbooking/users"
+                        data-questions-endpoint="/rbooking/questions"
+                        t-att-data-preselected-type-id="preselected_type_id or ''"
+                    >
+                        <select id="rbooking-types-data" class="d-none">
+                            <t t-foreach="types" t-as="t">
+                                <option
+                                    t-att-value="t.id"
+                                    t-att-data-name="t.display_name"
+                                    t-att-data-note="t.note or ''"
+                                    t-att-data-location="t.location or ''"
+                                    t-att-data-slug="t.slug or ''"
+                                    t-attf-data-image="/web/image/resource.booking.type/#{t.id}/image_1920"
+                                />
+                            </t>
+                        </select>
+                    </div>
                 </div>
             </div>
         </t>

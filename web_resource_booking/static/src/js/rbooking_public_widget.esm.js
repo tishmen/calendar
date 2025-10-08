@@ -17,6 +17,10 @@ publicWidget.registry.RBookingFormWidget = publicWidget.Widget.extend({
             types = Array.from(dataSelect.querySelectorAll("option")).map((opt) => ({
                 id: opt.value,
                 display_name: opt.dataset.name,
+                note: opt.dataset.note || "",
+                location: opt.dataset.location || "",
+                slug: opt.dataset.slug || "",
+                image: opt.dataset.image || "",
             }));
         }
         return mount(RBookingForm, root, {
