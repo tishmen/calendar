@@ -71,6 +71,9 @@
                 </div>
             </t>
             <div class="card-body">
+                <div class="alert alert-danger py-2" t-if="state.formError">
+                    <t t-out="state.formError" />
+                </div>
                 <t t-if="!props.preselectedTypeId and !state.type_id">
                     <div class="mb-3">
                         <label
@@ -170,6 +173,7 @@
                                 required="required"
                                 t-model="state.name"
                             />
+                            <div class="invalid-feedback">This field is required.</div>
                         </div>
                         <div class="col-12 col-md-6">
                             <label class="form-label" for="email">Your email</label>
@@ -181,6 +185,9 @@
                                 required="required"
                                 t-model="state.email"
                             />
+                            <div
+                                class="invalid-feedback"
+                            >Enter a valid email address.</div>
                         </div>
                     </div>
                 </t>
