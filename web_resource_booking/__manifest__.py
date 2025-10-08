@@ -15,6 +15,10 @@
     ],
     "assets": {
         "web.assets_frontend": [
+            # Avoid loading resource_booking tours in frontend (breaks registry)
+            ("remove", "resource_booking/static/src/js/booking_portal.esm.js"),
+            ("remove", "resource_booking/static/src/js/tours/**/*"),
+            # Our templates
             "web_resource_booking/static/src/xml/rbooking_form.xml",
         ],
         "web.assets_frontend_lazy": [

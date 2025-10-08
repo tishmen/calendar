@@ -6,6 +6,27 @@
             <div id="wrap" class="container mt-4">
                 <div class="mx-auto" style="max-width: 600px;">
                     <h2>Book an Appointment</h2>
+                    <!-- Step indicator: 1) Your Info 2) Schedule 3) Confirmation -->
+                    <div class="o_rbooking_steps d-flex align-items-center gap-3 my-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-primary">1</span>
+                            <span class="fw-semibold">Your Information</span>
+                        </div>
+                        <div class="flex-grow-1 border-top" style="opacity:.25;" />
+                        <div class="d-flex align-items-center gap-2 text-muted">
+                            <span
+                                class="badge rounded-pill bg-light text-muted border"
+                            >2</span>
+                            <span>Schedule</span>
+                        </div>
+                        <div class="flex-grow-1 border-top" style="opacity:.25;" />
+                        <div class="d-flex align-items-center gap-2 text-muted">
+                            <span
+                                class="badge rounded-pill bg-light text-muted border"
+                            >3</span>
+                            <span>Confirmation</span>
+                        </div>
+                    </div>
                     <div
                         id="rbooking-app"
                         data-users-endpoint="/rbooking/users"
