@@ -118,7 +118,14 @@ class WebResourceBookingController(http.Controller):
     @http.route(["/rbooking"], type="http", auth="public", website=True, sitemap=True)
     def rbooking_index(self, **kwargs):
         types = self._visible_booking_types()
-        values = {"types": types, "preselected_type_id": None}
+        # Placeholder for template API. User preselection is only resolved on
+        # the type-specific route and only via slug (?user=<user-slug>).
+        preselected_user_id = None
+        values = {
+            "types": types,
+            "preselected_type_id": None,
+            "preselected_user_id": preselected_user_id,
+        }
         return request.render("web_resource_booking.rbooking_type_select", values)
 
     @http.route(
@@ -135,11 +142,25 @@ class WebResourceBookingController(http.Controller):
         """
         types = self._visible_booking_types()
         preselected_type_id = None
+        preselected_user_id = None
         Type = request.env["resource.booking.type"].sudo()
         candidate = Type.search([("slug", "=", slug)], limit=1)
         if candidate and candidate in types:
             preselected_type_id = candidate.id
-        values = {"types": types, "preselected_type_id": preselected_type_id}
+            # If a user is requested via query params (?user=slug) resolve via slug only
+            user_slug_q = kwargs.get("user") or request.params.get("user")
+            if user_slug_q:
+                users = self._staff_users_for_type(candidate)
+                IrHttp = request.env["ir.http"]
+                for u in users:
+                    if IrHttp._slugify(u.name or "") == user_slug_q:
+                        preselected_user_id = u.id
+                        break
+        values = {
+            "types": types,
+            "preselected_type_id": preselected_type_id,
+            "preselected_user_id": preselected_user_id,
+        }
         return request.render("web_resource_booking.rbooking_type_select", values)
 
     @http.route(
@@ -150,40 +171,14 @@ class WebResourceBookingController(http.Controller):
         sitemap=True,
     )
     def rbooking_index_slug_user(self, slug, user_slug, **kwargs):
-        """Entry that preselects a type by slug and a user by slugified name.
+        """Deprecated path-based user selection.
 
-        Example: /rbooking/1-customer-meeting/john-doe
+        Redirect to canonical query-param URL to avoid route proliferation and
+        keep sitemap clean.
         """
-        types = self._visible_booking_types()
-        preselected_type_id = None
-        preselected_user_id = None
-        Type = request.env["resource.booking.type"].sudo()
-        candidate = Type.search([("slug", "=", slug)], limit=1)
-        if candidate and candidate in types:
-            preselected_type_id = candidate.id
-            # Try to match user among staff users for this type
-            users = self._staff_users_for_type(candidate)
-            # Allow numeric id or slugified name
-            try:
-                user_id_int = int(user_slug)
-            except Exception:
-                user_id_int = 0
-            if user_id_int:
-                user = users.filtered(lambda u: u.id == user_id_int)[:1]
-                if user:
-                    preselected_user_id = user.id
-            if not preselected_user_id:
-                IrHttp = request.env["ir.http"]
-                for u in users:
-                    if IrHttp._slugify(u.name or "") == user_slug:
-                        preselected_user_id = u.id
-                        break
-        values = {
-            "types": types,
-            "preselected_type_id": preselected_type_id,
-            "preselected_user_id": preselected_user_id,
-        }
-        return request.render("web_resource_booking.rbooking_type_select", values)
+        # Always redirect to canonical query-param slug form
+        target = f"/rbooking/{slug}?user={user_slug}"
+        return request.redirect(target, code=301)
 
     @http.route(
         ["/rbooking/users"], type="http", auth="public", website=True, csrf=False
